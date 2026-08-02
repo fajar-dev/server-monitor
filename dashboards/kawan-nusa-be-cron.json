@@ -1,6 +1,6 @@
 {
-  "title": "kawan-nusa-be - Cron Jobs",
-  "tags": ["kawan-nusa-be", "cron", "loki", "jobs"],
+  "title": "kawan-nusa-be | CRON",
+  "tags": ["kawan-nusa-be", "logs", "cron"],
   "timezone": "browser",
   "refresh": "1m",
   "time": { "from": "now-24h", "to": "now" },
