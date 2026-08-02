@@ -50,25 +50,3 @@ scrape_configs:
       - labels:
           level:
           service:
-
-  # ── Log cron / scheduled jobs ──────────────────────────────────
-  - job_name: <APP_NAME>-cron
-    static_configs:
-      - targets: [localhost]
-        labels:
-          job: <APP_NAME>-cron
-          host: <SERVER_NAME>
-          __path__: <APP_DIR>/logs/cron/*.log
-    pipeline_stages:
-      - json:
-          expressions:
-            time: time
-            level: level
-            task: task
-            event: event
-      - timestamp:
-          source: time
-          format: RFC3339Nano
-      - labels:
-          level:
-          task:

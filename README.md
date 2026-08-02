@@ -38,7 +38,7 @@ server-monitor/
 │   ├── prometheus.yml               # target scrape Prometheus (lokal + remote)
 │   ├── loki-config.yml              # storage & schema Loki
 │   ├── loki-auth.conf               # nginx Basic Auth di depan Loki
-│   ├── loki-auth-htpasswd.sh        # generate .htpasswd dari .env saat start
+│   ├── loki.htpasswd                # kredensial ter-hash (di-generate, gitignored)
 │   └── promtail-config.yml          # log lokal di server monitoring ini
 ├── examples/
 │   └── promtail-config.example.yaml # template Promtail (app + cron, dgn auth)
@@ -59,11 +59,14 @@ server-monitor/
 ## Prasyarat
 
 1. **Docker** & **Docker Compose** sudah terpasang.
-2. Salin `.env.example` → `.env` lalu isi kredensial Loki:
+2. Salin `.env.example` → `.env`, isi kredensial Loki, lalu generate file htpasswd-nya:
    ```bash
    cp .env.example .env
    # edit .env — set LOKI_USER dan LOKI_PASSWORD yang kuat
+   source .env
+   docker run --rm httpd:2.4-alpine htpasswd -nbB "$LOKI_USER" "$LOKI_PASSWORD" > config/loki.htpasswd
    ```
+   Ulangi perintah `htpasswd` ini setiap kali mengganti password, lalu `docker compose restart loki-auth`.
 3. Port berikut harus bisa diakses dari server-server yang ingin dipantau (idealnya lewat **private network/VPN**, bukan internet publik):
    - `9090` — kalau ingin Prometheus (di server ini) menarik metrik dari agent
    - `3100` — supaya Promtail di server lain bisa push log ke Loki di sini

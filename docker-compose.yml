@@ -59,12 +59,10 @@ services:
       - loki
     ports:
       - "3100:3100"
-    environment:
-      - LOKI_USER=${LOKI_USER}
-      - LOKI_PASSWORD=${LOKI_PASSWORD}
     volumes:
       - ./config/loki-auth.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./config/loki-auth-htpasswd.sh:/docker-entrypoint.d/10-loki-htpasswd.sh:ro
+      # Pre-generated from .env (see README). Container does NOT need internet.
+      - ./config/loki.htpasswd:/etc/nginx/.htpasswd:ro
     networks:
       - monitoring
     restart: always
