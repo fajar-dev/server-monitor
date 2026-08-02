@@ -33,13 +33,17 @@ Untuk server aplikasi yang ingin dipantau, pasang agent (cAdvisor + node-exporte
 ```
 server-monitor/
 ├── docker-compose.yml
+├── .env.example                     # template kredensial (LOKI_USER/LOKI_PASSWORD)
 ├── config/
 │   ├── prometheus.yml               # target scrape Prometheus (lokal + remote)
 │   ├── loki-config.yml              # storage & schema Loki
+│   ├── loki-auth.conf               # nginx Basic Auth di depan Loki
+│   ├── loki-auth-htpasswd.sh        # generate .htpasswd dari .env saat start
 │   └── promtail-config.yml          # log lokal di server monitoring ini
 ├── examples/
 │   ├── remote-agent-compose.yml     # template agent untuk server yang dipantau
-│   └── remote-promtail-config.yml   # template config Promtail untuk agent
+│   ├── remote-promtail-config.yml   # template config Promtail untuk agent
+│   └── promtail-is5x.yaml           # config Promtail is5x (app + cron, dgn auth)
 └── README.md
 ```
 
@@ -50,17 +54,23 @@ server-monitor/
 | cadvisor   | gcr.io/cadvisor/cadvisor   | 8080      | Metrik container di server monitoring ini sendiri |
 | prometheus | prom/prometheus            | 9090      | Query metrik (PromQL), scrape semua target |
 | grafana    | grafana/grafana            | 3030      | Dashboard                          |
-| loki       | grafana/loki                | 3100      | Menerima log dari semua Promtail (lokal & remote) |
+| loki       | grafana/loki                | —         | Internal only; menyimpan log (diakses via loki-auth / internal) |
+| loki-auth  | nginx:alpine                | 3100      | Basic Auth proxy di depan Loki untuk client eksternal |
 | promtail   | grafana/promtail            | 9080      | Kirim log container lokal ke Loki  |
 
 ## Prasyarat
 
 1. **Docker** & **Docker Compose** sudah terpasang.
-2. Port berikut harus bisa diakses dari server-server yang ingin dipantau (idealnya lewat **private network/VPN**, bukan internet publik):
+2. Salin `.env.example` → `.env` lalu isi kredensial Loki:
+   ```bash
+   cp .env.example .env
+   # edit .env — set LOKI_USER dan LOKI_PASSWORD yang kuat
+   ```
+3. Port berikut harus bisa diakses dari server-server yang ingin dipantau (idealnya lewat **private network/VPN**, bukan internet publik):
    - `9090` — kalau ingin Prometheus (di server ini) menarik metrik dari agent
    - `3100` — supaya Promtail di server lain bisa push log ke Loki di sini
 
-   ⚠️ **Keamanan**: `auth_enabled: false` di `config/loki-config.yml`, artinya siapa pun yang bisa mencapai port 3100 bisa push log tanpa autentikasi, dan Prometheus juga tidak memakai autentikasi ke target scrape. **Batasi lewat firewall/security group** agar hanya IP server yang dipantau yang boleh akses port-port ini, atau taruh di belakang VPN/private network.
+   🔐 **Autentikasi Loki**: port `3100` tidak langsung ke Loki, melainkan lewat proxy **`loki-auth`** (nginx) yang menerapkan HTTP Basic Auth dari `LOKI_USER`/`LOKI_PASSWORD` di `.env`. Setiap Promtail dari server lain wajib mengirim kredensial yang sama (`basic_auth` di config-nya — lihat [`examples/promtail-is5x.yaml`](examples/promtail-is5x.yaml)). Grafana & Promtail lokal mengakses Loki langsung di dalam network (`loki:3100`) tanpa auth. **Tetap disarankan** membatasi port `3100` & `9090` lewat firewall untuk lapisan pertahanan tambahan.
 
 Stack ini **tidak lagi bergantung pada Docker network eksternal** — semua service memakai network internal (`monitoring`) yang dibuat otomatis oleh compose file ini, karena server aplikasi yang dipantau tidak berada di host Docker yang sama.
 

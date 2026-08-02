@@ -1,0 +1,130 @@
+{
+  "title": "PM2 - is5x",
+  "tags": ["pm2", "is5x"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-6h", "to": "now" },
+  "schemaVersion": 39,
+  "version": 1,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {},
+        "hide": 0
+      },
+      {
+        "name": "app",
+        "type": "query",
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "query": { "query": "label_values(pm2_up, name)", "refId": "StandardVariableQuery" },
+        "refresh": 2,
+        "includeAll": false,
+        "multi": false,
+        "sort": 1
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Status",
+      "type": "stat",
+      "gridPos": { "x": 0, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_up{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" } }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            { "type": "value", "options": { "1": { "text": "UP", "color": "green" }, "0": { "text": "DOWN", "color": "red" } } }
+          ],
+          "thresholds": { "mode": "absolute", "steps": [{ "color": "green", "value": null }] }
+        },
+        "overrides": []
+      }
+    },
+    {
+      "id": 2,
+      "title": "Uptime",
+      "type": "stat",
+      "gridPos": { "x": 4, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_uptime{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" } }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] }
+    },
+    {
+      "id": 3,
+      "title": "Restarts",
+      "type": "stat",
+      "gridPos": { "x": 8, "y": 0, "w": 4, "h": 4 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_restarts{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" } }
+      ],
+      "fieldConfig": { "defaults": {}, "overrides": [] }
+    },
+    {
+      "id": 4,
+      "title": "CPU Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_cpu{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "cpu %" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] }
+    },
+    {
+      "id": 5,
+      "title": "Memory Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 4, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_memory{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "memory" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] }
+    },
+    {
+      "id": 6,
+      "title": "Event Loop Latency",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_event_loop_latency{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "latency" },
+        { "expr": "pm2_event_loop_latency_p95{name=\"$app\"}", "refId": "B", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "p95" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] }
+    },
+    {
+      "id": 7,
+      "title": "HTTP P95 Latency",
+      "type": "timeseries",
+      "gridPos": { "x": 12, "y": 12, "w": 12, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_http_p95_latency{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "p95" },
+        { "expr": "pm2_http_mean_latency{name=\"$app\"}", "refId": "B", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "mean" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "ms" }, "overrides": [] }
+    },
+    {
+      "id": 8,
+      "title": "Heap Usage",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 20, "w": 24, "h": 8 },
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "targets": [
+        { "expr": "pm2_heap_usage{name=\"$app\"}", "refId": "A", "datasource": { "type": "prometheus", "uid": "${datasource}" }, "legendFormat": "heap usage %" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] }
+    }
+  ]
+}

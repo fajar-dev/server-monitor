@@ -1,0 +1,66 @@
+{
+  "title": "Docker Logs - Monitoring Host",
+  "tags": ["docker", "logs", "loki"],
+  "timezone": "browser",
+  "refresh": "30s",
+  "time": { "from": "now-1h", "to": "now" },
+  "schemaVersion": 39,
+  "version": 1,
+  "templating": {
+    "list": [
+      {
+        "name": "datasource",
+        "type": "datasource",
+        "query": "loki",
+        "current": {},
+        "hide": 0
+      },
+      {
+        "name": "stream",
+        "type": "custom",
+        "query": "stdout,stderr",
+        "includeAll": true,
+        "multi": true,
+        "current": { "text": "All", "value": "$__all" }
+      }
+    ]
+  },
+  "panels": [
+    {
+      "id": 1,
+      "title": "Log Volume (per stream)",
+      "type": "timeseries",
+      "gridPos": { "x": 0, "y": 0, "w": 24, "h": 8 },
+      "datasource": { "type": "loki", "uid": "${datasource}" },
+      "targets": [
+        {
+          "expr": "sum by (stream) (count_over_time({job=\"docker\"} | json | stream=~\"$stream\" [$__interval]))",
+          "refId": "A",
+          "datasource": { "type": "loki", "uid": "${datasource}" },
+          "legendFormat": "{{stream}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] }
+    },
+    {
+      "id": 2,
+      "title": "Docker Container Logs",
+      "type": "logs",
+      "gridPos": { "x": 0, "y": 8, "w": 24, "h": 14 },
+      "datasource": { "type": "loki", "uid": "${datasource}" },
+      "targets": [
+        {
+          "expr": "{job=\"docker\"} | json | stream=~\"$stream\" | line_format \"{{.stream}}: {{.log}}\"",
+          "refId": "A",
+          "datasource": { "type": "loki", "uid": "${datasource}" }
+        }
+      ],
+      "options": {
+        "showTime": true,
+        "showLabels": false,
+        "wrapLogMessage": true,
+        "sortOrder": "Descending"
+      }
+    }
+  ]
+}
