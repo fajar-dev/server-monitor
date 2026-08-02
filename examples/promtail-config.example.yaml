@@ -1,0 +1,74 @@
+# Promtail — template config untuk server aplikasi yang dipantau.
+#
+# Salin file ini ke server target, lalu ganti SEMUA placeholder <...> :
+#   <MONITORING_HOST>  host/IP server monitoring (tempat Loki + loki-auth)
+#   <LOKI_USER>        harus sama dengan LOKI_USER  di .env server monitoring
+#   <LOKI_PASSWORD>    harus sama dengan LOKI_PASSWORD di .env server monitoring
+#   <APP_NAME>         nama aplikasi (jadi Loki job label, mis. myapp)
+#   <SERVER_NAME>      nama server ini (jadi label host, mis. app-01)
+#   <APP_DIR>          path absolut aplikasi di server ini (mis. /opt/myapp)
+#
+# Jalankan (salah satu):
+#   promtail -config.file=promtail-config.yaml
+#   pm2 start ./promtail --name promtail --interpreter none -- -config.file=promtail-config.yaml
+
+server:
+  http_listen_port: 9080
+  grpc_listen_port: 0
+
+positions:
+  filename: /var/lib/promtail/positions.yaml
+
+clients:
+  - url: http://<MONITORING_HOST>:3100/loki/api/v1/push
+    # Kredensial Basic Auth — cocokkan dengan .env di server monitoring.
+    basic_auth:
+      username: <LOKI_USER>
+      password: <LOKI_PASSWORD>
+
+scrape_configs:
+  # ── Log aplikasi (web/service) ─────────────────────────────────
+  - job_name: <APP_NAME>-app
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: <APP_NAME>-app
+          host: <SERVER_NAME>
+          __path__: <APP_DIR>/logs/app-*.log
+    pipeline_stages:
+      # Aktifkan blok ini HANYA jika log berupa JSON (NDJSON) per baris.
+      # Kalau log plain text, hapus seluruh pipeline_stages.
+      - json:
+          expressions:
+            time: time
+            level: level
+            service: service
+            event: event
+      - timestamp:
+          source: time
+          format: RFC3339Nano
+      - labels:
+          level:
+          service:
+
+  # ── Log cron / scheduled jobs ──────────────────────────────────
+  - job_name: <APP_NAME>-cron
+    static_configs:
+      - targets: [localhost]
+        labels:
+          job: <APP_NAME>-cron
+          host: <SERVER_NAME>
+          __path__: <APP_DIR>/logs/cron/*.log
+    pipeline_stages:
+      - json:
+          expressions:
+            time: time
+            level: level
+            task: task
+            event: event
+      - timestamp:
+          source: time
+          format: RFC3339Nano
+      - labels:
+          level:
+          task:

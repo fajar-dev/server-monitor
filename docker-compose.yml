@@ -42,8 +42,6 @@ services:
   loki:
     image: grafana/loki:latest
     container_name: loki
-    # No host port — Loki is only reachable inside the monitoring network.
-    # External clients go through loki-auth (Basic Auth) on port 3100.
     expose:
       - "3100"
     volumes:
