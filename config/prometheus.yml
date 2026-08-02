@@ -2,17 +2,24 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
-  # Prometheus memantau dirinya sendiri
-  - job_name: 'prometheus'
+  # Prometheus
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
-  # cAdvisor bawaan stack ini (memantau container di server monitoring ini sendiri)
-  - job_name: 'cadvisor'
+  # cAdvisor
+  - job_name: "cadvisor"
     static_configs:
-      - targets: ['cadvisor:8080']
+      - targets: ["cadvisor:8080"]
         labels:
-          server: 'monitoring-host'
+          server: "monitoring-host"
+
+  # PM2 metrics
+  - job_name: "pm2-is5x"
+    static_configs:
+      - targets: ["is5x.nusa.net.id:9209"]
+        labels:
+          server: "is5x"
 
   # ── Server lain yang dipantau (agent) ──────────────────────────────
   # Pasang cAdvisor + node-exporter di tiap server target (lihat
