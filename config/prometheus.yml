@@ -15,7 +15,10 @@ scrape_configs:
           server: "monitoring-host"
 
   # PM2 metrics
+  # fallback_scrape_protocol dibutuhkan karena endpoint ini tidak mengirim
+  # header Content-Type (dianggap error oleh Prometheus v3+ tanpa ini)
   - job_name: "pm2-is5x"
+    fallback_scrape_protocol: PrometheusText0.0.4
     static_configs:
       - targets: ["is5x.nusa.net.id:9209"]
         labels:
