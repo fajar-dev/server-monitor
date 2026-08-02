@@ -2,6 +2,34 @@ global:
   scrape_interval: 15s
 
 scrape_configs:
+  # Prometheus memantau dirinya sendiri
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # cAdvisor bawaan stack ini (memantau container di server monitoring ini sendiri)
   - job_name: 'cadvisor'
     static_configs:
       - targets: ['cadvisor:8080']
+        labels:
+          server: 'monitoring-host'
+
+  # ── Server lain yang dipantau (agent) ──────────────────────────────
+  # Pasang cAdvisor + node-exporter di tiap server target (lihat
+  # examples/remote-agent-compose.yml), lalu daftarkan IP:port-nya di sini.
+  #
+  # - job_name: 'cadvisor-remote'
+  #   static_configs:
+  #     - targets:
+  #         - '203.0.113.10:8080'   # app-server-a
+  #         - '203.0.113.11:8080'   # app-server-b
+  #       labels:
+  #         server: 'app-server'
+  #
+  # - job_name: 'node-exporter-remote'
+  #   static_configs:
+  #     - targets:
+  #         - '203.0.113.10:9100'
+  #         - '203.0.113.11:9100'
+  #       labels:
+  #         server: 'app-server'

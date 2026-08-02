@@ -10,20 +10,22 @@ services:
       - "/sys:/sys:ro"
       - "/var/lib/docker/:/var/lib/docker:ro"
     networks:
-      - shared_network
+      - monitoring
     restart: always
 
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
     volumes:
-      - /root/config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
     networks:
-      - shared_network
+      - monitoring
     restart: always
 
   grafana:
@@ -34,7 +36,7 @@ services:
     volumes:
       - grafana-data:/var/lib/grafana
     networks:
-      - shared_network
+      - monitoring
     restart: always
 
   loki:
@@ -43,10 +45,11 @@ services:
     ports:
       - "3100:3100"
     volumes:
-      - /root/config/loki-config.yml:/etc/loki/local-config.yml
+      - ./config/loki-config.yml:/etc/loki/local-config.yml
+      - loki-data:/loki
     command: -config.file=/etc/loki/local-config.yml
     networks:
-      - shared_network
+      - monitoring
     restart: always
 
   promtail:
@@ -55,18 +58,19 @@ services:
     ports:
       - "9080:9080"
     volumes:
-      - /root/config/promtail-config.yml:/etc/promtail/promtail-config.yml
+      - ./config/promtail-config.yml:/etc/promtail/promtail-config.yml
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
-      - /var/log:/var/log
+      - /var/log:/var/log:ro
     command: -config.file=/etc/promtail/promtail-config.yml
     networks:
-      - shared_network
+      - monitoring
     restart: always
 
 volumes:
   grafana-data:
+  prometheus-data:
+  loki-data:
 
 networks:
-  shared_network:
-    name: is5x_network
-    external: true
+  monitoring:
+    driver: bridge

@@ -9,17 +9,17 @@ clients:
   - url: http://loki:3100/loki/api/v1/push
 
 scrape_configs:
+  # Log container Docker milik stack monitoring ini sendiri
   - job_name: docker
     static_configs:
       - targets:
           - localhost
         labels:
           job: docker
+          host: monitoring-server
           __path__: /var/lib/docker/containers/*/*.log
-  - job_name: mail-sending-service
-    static_configs:
-      - targets:
-          - localhost
-        labels:
-          job: mail-sending-service
-          __path__: /var/log/mail-sending-service/*.log
+
+  # Log dari server lain TIDAK di-scrape dari sini.
+  # Pasang Promtail di masing-masing server yang mau dipantau dan arahkan
+  # ke http://<ip-server-monitoring-ini>:3100/loki/api/v1/push
+  # (lihat examples/remote-agent-compose.yml)
