@@ -1,6 +1,6 @@
 {
-  "title": "kawan-nusa-be Logs | APP",
-  "tags": ["kawan-nusa-be", "logs", "app"],
+  "title": "simas-be | APP",
+  "tags": ["simas-be", "logs", "app"],
   "timezone": "browser",
   "refresh": "30s",
   "time": { "from": "now-3h", "to": "now" },
@@ -19,7 +19,7 @@
         "name": "level",
         "type": "query",
         "datasource": { "type": "loki", "uid": "${datasource}" },
-        "query": "label_values({job=\"kawan-nusa-be-app\"}, level)",
+        "query": "label_values({job=\"simas-be-app\"}, level)",
         "refresh": 2,
         "includeAll": true,
         "multi": true,
@@ -44,7 +44,7 @@
       "gridPos": { "x": 0, "y": 1, "w": 4, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\", level=~\"$level\"} |~ \"$search\" [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum(count_over_time({job=\"simas-be-app\", level=~\"$level\"} |~ \"$search\" [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "value", "graphMode": "area", "textMode": "value" },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] }
@@ -56,7 +56,7 @@
       "gridPos": { "x": 4, "y": 1, "w": 4, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=200 and status<300 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=200 and status<300 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "value", "graphMode": "area", "textMode": "value" },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] }
@@ -68,7 +68,7 @@
       "gridPos": { "x": 8, "y": 1, "w": 4, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=400 and status<500 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=400 and status<500 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "value", "graphMode": "area", "textMode": "value" },
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] }
@@ -80,7 +80,7 @@
       "gridPos": { "x": 12, "y": 1, "w": 4, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=500 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=500 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "background", "graphMode": "area", "textMode": "value" },
       "fieldConfig": {
@@ -98,7 +98,7 @@
       "gridPos": { "x": 16, "y": 1, "w": 4, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "100 * sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=500 [$__range])) / sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=200 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "100 * sum(count_over_time({job=\"simas-be-app\"} | json | status>=500 [$__range])) / sum(count_over_time({job=\"simas-be-app\"} | json | status>=200 [$__range]))", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "background", "graphMode": "none", "textMode": "value" },
       "fieldConfig": {
@@ -117,7 +117,7 @@
       "gridPos": { "x": 20, "y": 1, "w": 4, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "quantile_over_time(0.95, {job=\"kawan-nusa-be-app\"} | json | unwrap duration_ms [$__range]) without (level, detected_level, filename)", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "quantile_over_time(0.95, {job=\"simas-be-app\"} | json | unwrap duration_ms [$__range]) without (level, detected_level, filename)", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
       "fieldConfig": {
@@ -140,10 +140,10 @@
       "gridPos": { "x": 0, "y": 6, "w": 12, "h": 8 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=200 and status<300 [$__auto]))", "refId": "A", "legendFormat": "2xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=300 and status<400 [$__auto]))", "refId": "B", "legendFormat": "3xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=400 and status<500 [$__auto]))", "refId": "C", "legendFormat": "4xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=500 [$__auto]))", "refId": "D", "legendFormat": "5xx", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=200 and status<300 [$__auto]))", "refId": "A", "legendFormat": "2xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=300 and status<400 [$__auto]))", "refId": "B", "legendFormat": "3xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=400 and status<500 [$__auto]))", "refId": "C", "legendFormat": "4xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=500 [$__auto]))", "refId": "D", "legendFormat": "5xx", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "fieldConfig": {
         "defaults": {
@@ -165,7 +165,7 @@
       "gridPos": { "x": 12, "y": 6, "w": 12, "h": 8 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum by (level) (count_over_time({job=\"kawan-nusa-be-app\", level=~\"$level\"} |~ \"$search\" [$__auto]))", "refId": "A", "legendFormat": "{{level}}", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum by (level) (count_over_time({job=\"simas-be-app\", level=~\"$level\"} |~ \"$search\" [$__auto]))", "refId": "A", "legendFormat": "{{level}}", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "fieldConfig": {
         "defaults": {
@@ -189,9 +189,9 @@
       "gridPos": { "x": 0, "y": 15, "w": 16, "h": 8 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "quantile_over_time(0.50, {job=\"kawan-nusa-be-app\"} | json | unwrap duration_ms [$__auto]) without (level, detected_level, filename)", "refId": "A", "legendFormat": "p50", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "quantile_over_time(0.95, {job=\"kawan-nusa-be-app\"} | json | unwrap duration_ms [$__auto]) without (level, detected_level, filename)", "refId": "B", "legendFormat": "p95", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "quantile_over_time(0.99, {job=\"kawan-nusa-be-app\"} | json | unwrap duration_ms [$__auto]) without (level, detected_level, filename)", "refId": "C", "legendFormat": "p99", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "quantile_over_time(0.50, {job=\"simas-be-app\"} | json | unwrap duration_ms [$__auto]) without (level, detected_level, filename)", "refId": "A", "legendFormat": "p50", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "quantile_over_time(0.95, {job=\"simas-be-app\"} | json | unwrap duration_ms [$__auto]) without (level, detected_level, filename)", "refId": "B", "legendFormat": "p95", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "quantile_over_time(0.99, {job=\"simas-be-app\"} | json | unwrap duration_ms [$__auto]) without (level, detected_level, filename)", "refId": "C", "legendFormat": "p99", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "fieldConfig": {
         "defaults": {
@@ -212,7 +212,7 @@
       "gridPos": { "x": 16, "y": 15, "w": 8, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "avg_over_time({job=\"kawan-nusa-be-app\"} | json | unwrap duration_ms [$__range]) without (level, detected_level, filename)", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "avg_over_time({job=\"simas-be-app\"} | json | unwrap duration_ms [$__range]) without (level, detected_level, filename)", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "value", "graphMode": "area", "textMode": "value" },
       "fieldConfig": { "defaults": { "unit": "ms", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] }
@@ -224,7 +224,7 @@
       "gridPos": { "x": 16, "y": 19, "w": 8, "h": 4 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "max_over_time({job=\"kawan-nusa-be-app\"} | json | unwrap duration_ms [$__range]) without (level, detected_level, filename)", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "max_over_time({job=\"simas-be-app\"} | json | unwrap duration_ms [$__range]) without (level, detected_level, filename)", "refId": "A", "instant": true, "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "colorMode": "value", "graphMode": "none", "textMode": "value" },
       "fieldConfig": {
@@ -245,7 +245,7 @@
       "gridPos": { "x": 0, "y": 24, "w": 8, "h": 8 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "topk(10, sum by (path) (count_over_time({job=\"kawan-nusa-be-app\"} | json | path=~\".+\" [$__range])))", "refId": "A", "instant": true, "format": "table", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "topk(10, sum by (path) (count_over_time({job=\"simas-be-app\"} | json | path=~\".+\" [$__range])))", "refId": "A", "instant": true, "format": "table", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
       "options": { "showHeader": true, "sortBy": [ { "displayName": "Value", "desc": true } ] }
@@ -257,7 +257,7 @@
       "gridPos": { "x": 8, "y": 24, "w": 8, "h": 8 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "topk(10, sum by (path) (count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=500 | path=~\".+\" [$__range])))", "refId": "A", "instant": true, "format": "table", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "topk(10, sum by (path) (count_over_time({job=\"simas-be-app\"} | json | status>=500 | path=~\".+\" [$__range])))", "refId": "A", "instant": true, "format": "table", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
       "options": { "showHeader": true, "sortBy": [ { "displayName": "Value", "desc": true } ] }
@@ -269,10 +269,10 @@
       "gridPos": { "x": 16, "y": 24, "w": 8, "h": 8 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=200 and status<300 [$__range]))", "refId": "A", "instant": true, "legendFormat": "2xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=300 and status<400 [$__range]))", "refId": "B", "instant": true, "legendFormat": "3xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=400 and status<500 [$__range]))", "refId": "C", "instant": true, "legendFormat": "4xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
-        { "expr": "sum(count_over_time({job=\"kawan-nusa-be-app\"} | json | status>=500 [$__range]))", "refId": "D", "instant": true, "legendFormat": "5xx", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=200 and status<300 [$__range]))", "refId": "A", "instant": true, "legendFormat": "2xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=300 and status<400 [$__range]))", "refId": "B", "instant": true, "legendFormat": "3xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=400 and status<500 [$__range]))", "refId": "C", "instant": true, "legendFormat": "4xx", "datasource": { "type": "loki", "uid": "${datasource}" } },
+        { "expr": "sum(count_over_time({job=\"simas-be-app\"} | json | status>=500 [$__range]))", "refId": "D", "instant": true, "legendFormat": "5xx", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "pieType": "donut", "legend": { "displayMode": "table", "placement": "right", "values": [ "value", "percent" ] } },
       "fieldConfig": {
@@ -295,7 +295,7 @@
       "gridPos": { "x": 0, "y": 33, "w": 24, "h": 14 },
       "datasource": { "type": "loki", "uid": "${datasource}" },
       "targets": [
-        { "expr": "{job=\"kawan-nusa-be-app\", level=~\"$level\"} |~ \"$search\" | json", "refId": "A", "datasource": { "type": "loki", "uid": "${datasource}" } }
+        { "expr": "{job=\"simas-be-app\", level=~\"$level\"} |~ \"$search\" | json", "refId": "A", "datasource": { "type": "loki", "uid": "${datasource}" } }
       ],
       "options": { "showTime": true, "showLabels": false, "wrapLogMessage": true, "prettifyLogMessage": true, "enableLogDetails": true, "dedupStrategy": "none", "sortOrder": "Descending" }
     }
