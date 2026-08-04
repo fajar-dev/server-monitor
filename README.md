@@ -40,6 +40,10 @@ server-monitor/
 │   ├── loki-auth.conf               # nginx Basic Auth di depan Loki
 │   ├── loki.htpasswd                # kredensial ter-hash (di-generate, gitignored)
 │   └── promtail-config.yml          # log lokal di server monitoring ini
+├── grafana/provisioning/
+│   ├── datasources/datasources.yaml # auto-provision Prometheus & Loki
+│   └── alerting/                    # contact point, policy, rule alert 5xx → Google Chat
+├── dashboards/                      # JSON dashboard (import via Grafana)
 ├── examples/
 │   └── promtail-config.example.yaml # template Promtail (app + cron, dgn auth)
 └── README.md
@@ -62,11 +66,12 @@ server-monitor/
 2. Salin `.env.example` → `.env`, isi kredensial Loki, lalu generate file htpasswd-nya:
    ```bash
    cp .env.example .env
-   # edit .env — set LOKI_USER dan LOKI_PASSWORD yang kuat
+   # edit .env — set LOKI_USER, LOKI_PASSWORD, dan GCHAT_WEBHOOK_URL
    source .env
    docker run --rm httpd:2.4-alpine htpasswd -nbB "$LOKI_USER" "$LOKI_PASSWORD" > config/loki.htpasswd
    ```
    Ulangi perintah `htpasswd` ini setiap kali mengganti password, lalu `docker compose restart loki-auth`.
+   `GCHAT_WEBHOOK_URL` dipakai untuk alerting 5xx (lihat bagian [Alerting](#alerting-5xx--google-chat)).
 3. Port berikut harus bisa diakses dari server-server yang ingin dipantau (idealnya lewat **private network/VPN**, bukan internet publik):
    - `9090` — kalau ingin Prometheus (di server ini) menarik metrik dari agent
    - `3100` — supaya Promtail di server lain bisa push log ke Loki di sini
@@ -108,12 +113,33 @@ docker compose down
 | cAdvisor   | `http://<ip-monitoring>:8080` | Metrik container di server monitoring sendiri                  |
 | Loki       | `http://<ip-monitoring>:3100` | API, biasanya diakses lewat Grafana, bukan langsung            |
 
-### Setup data source di Grafana
+### Data source di Grafana
 
-1. Buka Grafana → **Connections → Data sources → Add data source**.
-2. Tambahkan **Prometheus** dengan URL: `http://prometheus:9090`
-3. Tambahkan **Loki** dengan URL: `http://loki:3100`
-4. Import dashboard cAdvisor (mis. dashboard ID [`14282`](https://grafana.com/grafana/dashboards/14282)) atau Node Exporter (mis. ID [`1860`](https://grafana.com/grafana/dashboards/1860)) dari Grafana.com.
+Data source **Prometheus** & **Loki** sudah **di-provisioning otomatis** dari
+[`grafana/provisioning/datasources/`](grafana/provisioning/datasources/datasources.yaml)
+(uid `prometheus` & `loki`) — tidak perlu tambah manual. Kalau sebelumnya sudah menambah
+manual dengan nama sama, hapus yang manual agar tidak dobel.
+
+Import dashboard dari folder [`dashboards/`](dashboards/) (**Dashboards → Import → Upload JSON**),
+atau dashboard komunitas seperti cAdvisor ([`14282`](https://grafana.com/grafana/dashboards/14282))
+/ Node Exporter ([`1860`](https://grafana.com/grafana/dashboards/1860)).
+
+## Alerting 5xx → Google Chat
+
+Grafana otomatis memuat alert dari [`grafana/provisioning/alerting/`](grafana/provisioning/alerting/):
+kalau ada log `status >= 500` dari job Loki `*-app` (mis. `kawan-nusa-be-app`, `simas-be-app`)
+dalam 5 menit terakhir, alert **HTTP 5xx Errors** fire dan dikirim ke Google Chat.
+
+Cara pakai:
+1. Buat webhook di space Google Chat: **Space → Apps & integrations → Webhooks → Add webhook**, salin URL-nya.
+2. Isi `GCHAT_WEBHOOK_URL` di `.env` dengan URL tersebut, lalu `docker compose up -d grafana`.
+3. Cek di Grafana → **Alerting → Alert rules** (rule *HTTP 5xx Errors*) & **Contact points** (*google-chat* → tombol **Test**).
+
+Detail perilaku:
+- Dievaluasi tiap **1 menit**, `for: 0m` → fire dalam ≤1 menit sejak 5xx muncul.
+- Satu alert **per job** (label `job`), jadi tahu app mana yang error.
+- Bergantung pada log terstruktur (`status` di JSON) yang dikirim Promtail dari job `*-app`.
+- Ubah ambang/rentang di [`grafana/provisioning/alerting/rules.yaml`](grafana/provisioning/alerting/rules.yaml).
 
 ## Menambahkan server baru untuk dipantau
 

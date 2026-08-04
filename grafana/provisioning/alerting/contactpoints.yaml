@@ -1,0 +1,14 @@
+# Google Chat contact point. The webhook URL is read from the GCHAT_WEBHOOK_URL
+# environment variable (set in .env → passed to the grafana container), so the
+# secret never lives in this file.
+apiVersion: 1
+
+contactPoints:
+  - orgId: 1
+    name: google-chat
+    receivers:
+      - uid: gchat-webhook
+        type: googlechat
+        settings:
+          url: $__env{GCHAT_WEBHOOK_URL}
+        disableResolveMessage: false

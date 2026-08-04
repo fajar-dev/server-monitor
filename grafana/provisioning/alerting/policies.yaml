@@ -1,0 +1,10 @@
+# Route all alerts to Google Chat. (Only one rule exists — the 5xx detector.)
+apiVersion: 1
+
+policies:
+  - orgId: 1
+    receiver: google-chat
+    group_by: ['alertname', 'job']
+    group_wait: 30s
+    group_interval: 1m
+    repeat_interval: 1h
