@@ -55,7 +55,7 @@ server-monitor/
 | ---------- | ------------------------ | --------- | --------------------------------------------------------------- |
 | cadvisor   | gcr.io/cadvisor/cadvisor | 8080      | Metrik container di server monitoring ini sendiri               |
 | prometheus | prom/prometheus          | 9090      | Query metrik (PromQL), scrape semua target                      |
-| grafana    | grafana/grafana          | 3030      | Dashboard                                                       |
+| grafana    | grafana/grafana          | 3000      | Dashboard                                                       |
 | loki       | grafana/loki             | —         | Internal only; menyimpan log (diakses via loki-auth / internal) |
 | loki-auth  | nginx:alpine             | 3100      | Basic Auth proxy di depan Loki untuk client eksternal           |
 | promtail   | grafana/promtail         | 9080      | Kirim log container lokal ke Loki                               |
@@ -108,7 +108,7 @@ docker compose down
 
 | Tool       | URL                           | Keterangan                                                     |
 | ---------- | ----------------------------- | -------------------------------------------------------------- |
-| Grafana    | `http://<ip-monitoring>:3030` | Login default `admin` / `admin` (ganti saat login pertama)     |
+| Grafana    | `http://<ip-monitoring>:3000` | Login default `admin` / `admin` (ganti saat login pertama)     |
 | Prometheus | `http://<ip-monitoring>:9090` | Query PromQL & cek status target scrape (**Status → Targets**) |
 | cAdvisor   | `http://<ip-monitoring>:8080` | Metrik container di server monitoring sendiri                  |
 | Loki       | `http://<ip-monitoring>:3100` | API, biasanya diakses lewat Grafana, bukan langsung            |
