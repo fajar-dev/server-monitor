@@ -5,7 +5,7 @@ Stack observability (metrik + log) berbasis Docker Compose, di-deploy di **serve
 ## Arsitektur
 
 ```
- Server Monitoring (stack ini)                    Server Aplikasi (agent, lihat examples/)
+ Server Monitoring (stack ini)                    Server Aplikasi (agent, lihat docs/)
 ┌─────────────────────────────────────┐          ┌───────────────────────────┐
 │  ┌──────────┐      ┌────────────┐   │  metrik  │  cAdvisor + node-exporter │
 │  │  Grafana │◀────▶│ Prometheus │◀──┼──────────┼── (scrape via IP:port)    │
@@ -26,7 +26,7 @@ Stack observability (metrik + log) berbasis Docker Compose, di-deploy di **serve
 - **cAdvisor** (di stack ini) — memantau container yang berjalan di server monitoring itu sendiri (self-monitoring).
 - **Promtail** (di stack ini) — mengirim log container di server monitoring itu sendiri ke Loki.
 
-Untuk server aplikasi yang ingin dipantau, pasang agent (cAdvisor + node-exporter + Promtail) di server tersebut — lihat [`examples/promtail-config.example.yaml`](examples/promtail-config.example.yaml) dan bagian [Menambahkan server baru](#menambahkan-server-baru-untuk-dipantau) di bawah.
+Untuk server aplikasi yang ingin dipantau, pasang agent (cAdvisor + node-exporter + Promtail) di server tersebut — lihat [`docs/promtail-config.example.yaml`](docs/promtail-config.example.yaml) dan bagian [Menambahkan server baru](#menambahkan-server-baru-untuk-dipantau) di bawah.
 
 ## Struktur direktori
 
@@ -44,7 +44,8 @@ server-monitor/
 │   ├── datasources/datasources.yaml # auto-provision Prometheus & Loki
 │   └── alerting/                    # contact point, policy, rule alert 5xx → Google Chat
 ├── dashboards/                      # JSON dashboard (import via Grafana)
-├── examples/
+├── docs/
+│   ├── install-promtail.md          # panduan pasang Promtail di server lain
 │   └── promtail-config.example.yaml # template Promtail (app + cron, dgn auth)
 └── README.md
 ```
@@ -76,7 +77,7 @@ server-monitor/
    - `9090` — kalau ingin Prometheus (di server ini) menarik metrik dari agent
    - `3100` — supaya Promtail di server lain bisa push log ke Loki di sini
 
-   🔐 **Autentikasi Loki**: port `3100` tidak langsung ke Loki, melainkan lewat proxy **`loki-auth`** (nginx) yang menerapkan HTTP Basic Auth dari `LOKI_USER`/`LOKI_PASSWORD` di `.env`. Setiap Promtail dari server lain wajib mengirim kredensial yang sama (`basic_auth` di config-nya — lihat [`examples/promtail-config.example.yaml`](examples/promtail-config.example.yaml)). Grafana & Promtail lokal mengakses Loki langsung di dalam network (`loki:3100`) tanpa auth. **Tetap disarankan** membatasi port `3100` & `9090` lewat firewall untuk lapisan pertahanan tambahan.
+   🔐 **Autentikasi Loki**: port `3100` tidak langsung ke Loki, melainkan lewat proxy **`loki-auth`** (nginx) yang menerapkan HTTP Basic Auth dari `LOKI_USER`/`LOKI_PASSWORD` di `.env`. Setiap Promtail dari server lain wajib mengirim kredensial yang sama (`basic_auth` di config-nya — lihat [`docs/promtail-config.example.yaml`](docs/promtail-config.example.yaml)). Grafana & Promtail lokal mengakses Loki langsung di dalam network (`loki:3100`) tanpa auth. **Tetap disarankan** membatasi port `3100` & `9090` lewat firewall untuk lapisan pertahanan tambahan.
 
 Stack ini **tidak lagi bergantung pada Docker network eksternal** — semua service memakai network internal (`monitoring`) yang dibuat otomatis oleh compose file ini, karena server aplikasi yang dipantau tidak berada di host Docker yang sama.
 
@@ -147,7 +148,7 @@ Setiap server aplikasi yang ingin dipantau memasang **agent** (bukan stack lengk
 
 ### Log (push ke Loki)
 
-1. Salin [`examples/promtail-config.example.yaml`](examples/promtail-config.example.yaml) ke server target, ganti semua placeholder `<...>` (host monitoring, kredensial Loki, nama app/server, path log).
+1. Salin [`docs/promtail-config.example.yaml`](docs/promtail-config.example.yaml) ke server target, ganti semua placeholder `<...>` (host monitoring, kredensial Loki, nama app/server, path log).
 2. Jalankan Promtail di server target (binary langsung, atau lewat PM2 — lihat komentar di file example).
 3. Log **otomatis muncul** di Loki begitu Promtail jalan (push-based) — tidak perlu konfigurasi tambahan di sisi server monitoring.
 
