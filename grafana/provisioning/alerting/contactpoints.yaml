@@ -1,6 +1,6 @@
-# Google Chat contact point. The webhook URL is read from the GCHAT_WEBHOOK_URL
-# environment variable (set in .env → passed to the grafana container), so the
-# secret never lives in this file.
+# Google Chat contact point with a custom, informative message.
+# The webhook URL is read from the GCHAT_WEBHOOK_URL env var (set in .env), so
+# the secret never lives in this file.
 apiVersion: 1
 
 contactPoints:
@@ -9,6 +9,18 @@ contactPoints:
     receivers:
       - uid: gchat-webhook
         type: googlechat
+        # Only notify on firing (skip "resolved" noise).
+        disableResolveMessage: true
         settings:
           url: $__env{GCHAT_WEBHOOK_URL}
-        disableResolveMessage: false
+          title: '🔴 HTTP 5xx — {{ .CommonLabels.job }}'
+          # One block per failing endpoint. Includes a ready-to-paste LogQL query
+          # to open the actual error lines + stack trace in Grafana Explore.
+          message: |
+            {{ range .Alerts }}━━━━━━━━━━━━━━━━━━━━
+            App       : {{ .Labels.job }}
+            Endpoint  : {{ .Labels.method }} {{ .Labels.path }}
+            Jumlah    : {{ .Values.A }} error 5xx (5 menit terakhir)
+            Waktu     : {{ .StartsAt.Format "2006-01-02 15:04:05" }}
+            Lihat trace : {job="{{ .Labels.job }}"} | json | status>=500 | path="{{ .Labels.path }}"
+            {{ end }}

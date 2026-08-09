@@ -1,6 +1,6 @@
-# Fires when any *-app job logs an HTTP 5xx within the last 5 minutes.
-# Evaluated every minute; one alert instance per job (kawan-nusa-be-app,
-# simas-be-app, ...). Routed to the google-chat contact point.
+# Fires per (job, method, path) when a *-app job logs HTTP 5xx in the last 5 min.
+# Grouping by endpoint makes each failing route its own alert instance, so the
+# Google Chat message can name exactly which endpoint broke (not just the app).
 apiVersion: 1
 
 groups:
@@ -18,8 +18,8 @@ groups:
         labels:
           severity: critical
         annotations:
-          summary: 'Ada error HTTP 5xx pada {{ $labels.job }}'
-          description: 'Terdeteksi {{ $values.A }} response 5xx dalam 5 menit terakhir pada {{ $labels.job }}. Cek dashboard log di Grafana untuk detail (path & stack trace).'
+          summary: 'HTTP 5xx pada {{ $labels.job }} — {{ $labels.method }} {{ $labels.path }}'
+          description: '{{ $values.A }} response 5xx dalam 5 menit terakhir.'
         data:
           - refId: A
             relativeTimeRange:
@@ -31,7 +31,7 @@ groups:
                 type: loki
                 uid: loki
               editorMode: code
-              expr: 'sum by (job) (count_over_time({job=~".+-app"} | json | status >= 500 [5m]))'
+              expr: 'sum by (job, method, path) (count_over_time({job=~".+-app"} | json | status >= 500 [5m]))'
               queryType: instant
               intervalMs: 1000
               maxDataPoints: 43200

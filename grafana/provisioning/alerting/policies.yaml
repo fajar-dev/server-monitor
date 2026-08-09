@@ -1,10 +1,11 @@
-# Route all alerts to Google Chat. (Only one rule exists — the 5xx detector.)
+# Route all alerts to Google Chat. Group by endpoint so a 5xx on a different
+# route/app produces its own notification (bukan digabung jadi satu).
 apiVersion: 1
 
 policies:
   - orgId: 1
     receiver: google-chat
-    group_by: ['alertname', 'job']
-    group_wait: 30s
+    group_by: ['alertname', 'job', 'method', 'path']
+    group_wait: 15s
     group_interval: 1m
     repeat_interval: 1h
